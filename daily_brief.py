@@ -8,7 +8,6 @@ import html
 import pathlib
 import re
 import textwrap
-import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 

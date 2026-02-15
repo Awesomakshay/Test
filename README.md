@@ -1,25 +1,45 @@
 # Akshay CA Daily Growth Setup
 
-This setup generates a daily reading brief from internet sources relevant to a practicing CA in India.
+This setup gives you a **daily reading + action brief** so you improve as a CA and create public-facing content consistently.
 
-## What it does
+## Do you get an executable file?
 
-- Fetches fresh RSS articles from tax, regulation, markets, and psychology sources.
-- Sorts content into 4 tracks:
-  - Tax & Compliance
-  - Markets & Investing
-  - Behavioral Finance
-  - Public Connect
-- Generates a daily markdown brief at `briefs/YYYY-MM-DD.md`.
-- Adds execution prompts so reading turns into content + better decision habits.
+Yes — you now have **two ways**:
 
-## Run manually
+1. **Direct Python script**: `daily_brief.py`
+2. **Executable launcher**: `run_daily_brief.sh` (double-click style for terminal use)
+
+You can also make the Python file itself executable.
+
+## Quick start (2 minutes)
+
+```bash
+cd /workspace/Test
+chmod +x run_daily_brief.sh daily_brief.py
+./run_daily_brief.sh
+```
+
+This creates a file like:
+
+- `briefs/YYYY-MM-DD.md`
+
+## How to use it daily
+
+After running, open the generated brief and follow this sequence:
+
+1. Read top items in **Tax & Compliance** and **Markets & Investing**.
+2. Pick one topic and write a 100-word simple explanation for clients.
+3. Record one 60-second reel/short from that same topic.
+4. Post one insight on X with "public impact" angle.
+5. Note one bias/mistake in your decision journal.
+
+## Manual run
 
 ```bash
 python3 daily_brief.py
 ```
 
-## Set daily automation (Linux cron)
+## Daily automation (Linux cron)
 
 ```bash
 crontab -e
@@ -28,19 +48,26 @@ crontab -e
 Add this line (runs at 6:30 AM daily):
 
 ```cron
-30 6 * * * cd /workspace/Test && /usr/bin/python3 daily_brief.py >> /workspace/Test/briefs/cron.log 2>&1
+30 6 * * * cd /workspace/Test && /workspace/Test/run_daily_brief.sh >> /workspace/Test/briefs/cron.log 2>&1
 ```
 
-## Recommended daily loop (45–60 min)
+## If feed links fail sometimes
 
-1. Read top 3 Tax/Markets articles.
-2. Convert one article to a plain-language client explainer.
-3. Record one short video hook.
-4. Post one insight on X with a public-impact angle.
-5. Journal one decision error (bias) you noticed that day.
+Some networks/VPN/proxy setups block RSS with `403`. The script is built to:
+
+- continue running,
+- generate the daily brief file,
+- show warnings so you can retry later.
+
+## What this setup includes
+
+- `daily_brief.py`: fetch + classify + generate daily brief.
+- `run_daily_brief.sh`: executable launcher.
+- `profile_akshay.yaml`: your profile/preferences reference.
+- `briefs/`: output folder for daily briefs.
 
 ## Extra ideas to improve faster
 
-- Keep a `decision_journal.md` with 3 entries/day: market, creator, personal.
-- Use a weekly review every Sunday: what performed, what to drop, what to double-down.
-- Build a "topic bank" from recurring audience comments and turn that into next week's scripts.
+- Keep `decision_journal.md` with 3 entries/day: market, creator, personal.
+- Sunday weekly review: what worked, what to stop, what to double-down.
+- Build a topic bank from comments and reuse for next week’s scripts.
