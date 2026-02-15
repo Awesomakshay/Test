@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import datetime as dt
 import html
 import pathlib
@@ -140,8 +141,30 @@ def generate_markdown(grouped: dict[str, list[dict[str, str]]]) -> str:
     return "\n".join(sections)
 
 
+def count_items(grouped: dict[str, list[dict[str, str]]]) -> int:
+    return sum(len(v) for v in grouped.values())
+
+
+def preview(out_path: pathlib.Path, lines: int = 20) -> None:
+    print("\nPreview:")
+    for idx, line in enumerate(out_path.read_text(encoding="utf-8").splitlines(), start=1):
+        if idx > lines:
+            print("... (truncated)")
+            break
+        print(line)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Generate a daily CA growth brief.")
+    parser.add_argument("--preview", action="store_true", help="Print first lines of generated brief.")
+    return parser
+
+
 def main() -> None:
+    args = build_parser().parse_args()
+
     all_items = []
+    failures = 0
     for source, url in FEEDS.items():
         try:
             xml_text = fetch(url)
@@ -149,9 +172,10 @@ def main() -> None:
             for e in entries:
                 e["source"] = source
             all_items.extend(entries)
-            print(f"Fetched {len(entries):3d} items from {source}")
+            print(f"OK   {source}: fetched {len(entries)} items")
         except Exception as exc:  # broad to keep pipeline resilient
-            print(f"WARN: could not fetch {source}: {exc}")
+            failures += 1
+            print(f"WARN {source}: {exc}")
 
     grouped = classify(all_items)
     md = generate_markdown(grouped)
@@ -160,9 +184,16 @@ def main() -> None:
     out_path = OUTPUT_DIR / f"{dt.date.today().isoformat()}.md"
     out_path.write_text(md, encoding="utf-8")
 
-    print(f"\nSaved daily brief: {out_path}")
+    print("\n=== Run summary ===")
+    print(f"Feeds configured : {len(FEEDS)}")
+    print(f"Feeds failed     : {failures}")
+    print(f"Articles selected: {count_items(grouped)}")
+    print(f"Brief file       : {out_path}")
     if PROFILE_PATH.exists():
-        print(f"Using profile: {PROFILE_PATH}")
+        print(f"Profile          : {PROFILE_PATH}")
+
+    if args.preview:
+        preview(out_path)
 
 
 if __name__ == "__main__":
